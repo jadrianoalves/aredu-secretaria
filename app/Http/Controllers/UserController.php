@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\RequestRegister;
 use App\services\UserService;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class UserController extends Controller
 {
@@ -12,10 +13,13 @@ class UserController extends Controller
     
     public function __construct(UserService $model) {
         $this->model = $model;
-        $this->middleware(['role:admin'])->only('create');
+        $this->middleware(['role:administrator'],['only' => ['createAdmin','createMananger']]); 
+        $this->middleware(['role:mananger'],['except' => ['createAdmin']]);
+        $this->middleware(['role:secretary'],['except' => ['createAdmin', 'createManger', 'createHardMaster', 'createSecretary' ]]);
+        $this->middleware(['role:headmaster'],['except' => ['createAdmin', 'createManger', 'createHardMaster', 'createSecretary' ]]);
     }
     
-    private function register(RequestRegister $request)
+    private function register(RequestRegister $request, $role)
     {
         $request->validated();
         
@@ -23,12 +27,21 @@ class UserController extends Controller
                 'name' => $request->name,
         	'email' => $request->email,
         	'password' => bcrypt($request->password),
-                'role'=>$request->role,
-                'active' => 1,
-                'id'=>$request->id
+                'birthday' =>$request->birthday,
+                'gener' =>$request->gener,
+                'cpf'=>$request->cpf,
+                'phone_number'=> $request->phone_number,
+                'active'=> 1,
+                'role' => $role,
+
                 ]);
-                
-        return Response()->json($result->payload,$result->statusCode);
+              try{
+                  return Response()->json($result->payload,$result->statusCode);
+              }catch(UnauthorizedException $e)
+              {
+                  return Response()->json('erro');
+              }  
+        
         
     }
     
@@ -52,50 +65,45 @@ class UserController extends Controller
     
     public function createAdmin(RequestRegister $request)
     {
-        $request->role = 'administrator';
-        return $this->register($request);
+        return $this->register($request, 'administrator');
     }
     
     public function createMananger(RequestRegister $request)
     {
-        $request->role = 'mananger';
-        return $this->register($request);
+        return $this->register($request,  'mananger');
     }
     
     public function createHeadMaster(RequestRegister $request)
     {
-        $request->role = 'headmaster';
-        return $this->register($request);
+        return $this->register($request, 'headmaster');
     }
     
     public function createSupervisor(RequestRegister $request)
     {
-        $request->role = 'supervisor';
-        return $this->register($request);
+        return $this->register($request, 'supervisor');
     }
     
     public function createSecretary(RequestRegister $request)
     {
-        $request->role = 'supervisor';
-        return $this->register($request);
+        return $this->register($request, 'secretary');
     }
     
     public function createTeacher(RequestRegister $request)
     {
-        $request->role = 'teacher';
-        return $this->register($request);
+        return $this->register($request, 'teacher');
     }
     
     public function createAccountable(RequestRegister $request)
     {
-        $request->role = 'acontable';
-        return $this->register($request);
+        return $this->register($request, 'acontable');
     }
     
     public function createStudent(RequestRegister $request)
     {
-        $request->role = 'student';
-        return $this->register($request);
+        return $this->register($request, 'student');
     }
+    
+    
+    
     
 }

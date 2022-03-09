@@ -16,10 +16,9 @@ class UserRepository extends Repository{
     
     
     
-    public function store($user)
+    public function store($data)
     {               
-        
-        $user = $this->user = User::create($user)->assignRole($user['role']);
+        $user = $this->user = User::create($data)->assignRole($data['role']);
         return $user?ResultResponse::create(true,'User Created success',$user,200):ResultResponse::create(false,'Ocurren an error',[],400);
         
     }
