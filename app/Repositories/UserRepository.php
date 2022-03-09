@@ -40,7 +40,7 @@ class UserRepository extends Repository{
     {
         $user = User::find(auth()->user()->id);
         $user->schools()->detach($data);
-        return $user?ResultResponse::create(true,'School detached success',$user,200):ResultResponse::create(false,'Ocurren an error',[],400);;
+        return $user?ResultResponse::create(true,'School detached success',$user,200):ResultResponse::create(false,'Ocurren an error',[],400);
         
     }
     
@@ -66,10 +66,16 @@ class UserRepository extends Repository{
         return isset($result);
     }
     
-    public function blockUser($user)
+    public function blockUser($user, $option)
     {
         $user = User::find($user);
-        $user->active = 0;
+        if($user)
+        {
+            $user->active = $option;
+            $user->save();
+        }
+        
+        return $user?ResultResponse::create(true,'Activation status change success',$user,200):ResultResponse::create(false,'User not exists',[],400); 
     }
     
     

@@ -13,10 +13,10 @@ class UserController extends Controller
     
     public function __construct(UserService $model) {
         $this->model = $model;
-        $this->middleware(['role:administrator'],['only' => ['createAdmin','createMananger']]); 
-        $this->middleware(['role:mananger'],['except' => ['createAdmin']]);
-        $this->middleware(['role:secretary'],['except' => ['createAdmin', 'createManger', 'createHardMaster', 'createSecretary' ]]);
-        $this->middleware(['role:headmaster'],['except' => ['createAdmin', 'createManger', 'createHardMaster', 'createSecretary' ]]);
+        $this->middleware(['role:administrator'],['only' => ['createAdmin','createMananger',]]); 
+        $this->middleware(['role:mananger | administrator'],['only' => ['createHeadMaster', 'createSecretary']]);
+        $this->middleware(['role:secretary | mananger | headmaster'],['only' => ['createSupervisor', 'createTeacher', 'createAccountable', 'createStudent', 'blockUser' ]]);
+        
     }
     
     private function register(RequestRegister $request, $role)
@@ -41,7 +41,6 @@ class UserController extends Controller
               {
                   return Response()->json('erro');
               }  
-        
         
     }
     
@@ -103,6 +102,11 @@ class UserController extends Controller
         return $this->register($request, 'student');
     }
     
+    public function blockUser(Request $request)
+    {
+        $result = $this->model->blockUser($request->id, $request->option);
+        return Response()->json($result->payload,$result->statusCode);
+    }
     
     
     

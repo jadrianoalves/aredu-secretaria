@@ -94,6 +94,11 @@ class UserService {
         return ResultResponse::create(true,'All schools for this user',$schools,200);
     }
     
+    public function blockUser($user, $option)
+    {
+        return $this->model->blockUser($user, $option);
+    }
+    
     
     
        

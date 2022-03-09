@@ -43,7 +43,7 @@ class Handler extends ExceptionHandler
                 'success' => false,
                 'message' => 'You do not have the required authorization.',
                 'data' => [],
-                ],400);
+                ],403);
     });
         
     }

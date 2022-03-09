@@ -29,6 +29,7 @@ class AuthService {
 
         }
  	
+        
         if(auth()->user()->active==0)
         {
             return ResultResponse::create(false, 'User is blocked', [], 200);
